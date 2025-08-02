@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator Pro</title>
+  <style>
+    body {
+      background-color: #121212;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 0.5rem 0 1rem;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+    }
+    input[type="color"] {
+      height: 40px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00c853;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #00b44b;
+    }
+    canvas {
+      margin-top: 1rem;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .ads, .share {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .share button {
+      background: #25d366;
+      margin: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+    .telegram {
+      background: #0088cc;
+    }
+    .instagram {
+      background: #e1306c;
+    }
+    .share button img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🔼 Adsterra Top Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key': '2d7ed1c027a3c1c80e6a100e9fc60492',
+        'format': 'iframe',
+        'height': 60,
+        'width': 468,
+        'params': {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/2d7ed1c027a3c1c80e6a100e9fc60492/invoke.js"></script>
+  </div>
+
+  <h1>QR Code Generator Pro</h1>
+
+  <div class="container">
+    <textarea id="qrText" placeholder="Enter text, URL or anything here"></textarea>
+
+    <div class="row">
+      <label>Size:
+        <select id="qrSize">
+          <option value="200">200x200</option>
+          <option value="250" selected>250x250</option>
+          <option value="300">300x300</option>
+        </select>
+      </label>
+      <label>Font:
+        <select id="fontSelect">
+          <option value="Arial">Arial</option>
+          <option value="Courier New">Courier</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Comic Sans MS">Comic Sans</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <label>FG Color:
+        <input type="color" id="fgColor" value="#000000" />
+      </label>
+      <label>BG Color:
+        <input type="color" id="bgColor" value="#ffffff" />
+      </label>
+    </div>
+
+    <label>Background Image URL:</label>
+    <input type="text" id="bgImage" placeholder="Optional background image URL" />
+
+    <label>Upload Logo (optional):</label>
+    <input type="file" id="logoInput" accept="image/*" />
+
+    <label>Upload Photo to Encode:</label>
+    <input type="file" id="photoInput" accept="image/*" />
+
+    <button onclick="generateQRCode()">Generate QR Code</button>
+
+    <canvas id="qrCanvas"></canvas>
+
+    <button onclick="downloadQR()">Download QR as PNG</button>
+
+    <div class="share">
+      <h3>🔗 Share:</h3>
+      <button onclick="shareWhatsApp()">
+        <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png"/> WhatsApp
+      </button>
+      <button class="telegram" onclick="shareTelegram()">
+        <img src="https://img.icons8.com/ios-filled/24/ffffff/telegram-app.png"/> Telegram
+      </button>
+      <button class="instagram" onclick="shareInstagram()">
+        <img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png"/> Instagram
+      </button>
+    </div>
+  </div>
+
+  <!-- 🔽 Adsterra Bottom Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key': '2d7ed1c027a3c1c80e6a100e9fc60492',
+        'format': 'iframe',
+        'height': 60,
+        'width': 468,
+        'params': {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/2d7ed1c027a3c1c80e6a100e9fc60492/invoke.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    const imgbbApiKey = "demo-key-123456"; // Replace with real API key
+
+    async function uploadImage(file) {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbApiKey, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      return data.data.url;
+    }
+
+    async function generateQRCode() {
+      const textInput = document.getElementById("qrText").value.trim();
+      const photoFile = document.getElementById("photoInput").files[0];
+      const logoFile = document.getElementById("logoInput").files[0];
+      const canvas = document.getElementById("qrCanvas");
+      const size = parseInt(document.getElementById("qrSize").value);
+      const fgColor = document.getElementById("fgColor").value;
+      const bgColor = document.getElementById("bgColor").value;
+      const font = document.getElementById("fontSelect").value;
+      const bgImage = document.getElementById("bgImage").value;
+
+      let finalText = textInput;
+
+      if (photoFile) {
+        finalText = await uploadImage(photoFile);
+      }
+
+      if (finalText.startsWith("http")) {
+        try {
+          const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(finalText)}`);
+          finalText = await res.text();
+        } catch (e) {
+          console.warn("Short link failed, using original URL.");
+        }
+      }
+
+      if (bgImage) {
+        document.body.style.backgroundImage = `url(${bgImage})`;
+        document.body.style.backgroundSize = "cover";
+      }
+
+      document.body.style.fontFamily = font;
+
+      QRCode.toCanvas(canvas, finalText, {
+        width: size,
+        color: {
+          dark: fgColor,
+          light: bgColor
+        }
+      }, function (error) {
+        if (error) console.error(error);
+
+        if (logoFile) {
+          const ctx = canvas.getContext("2d");
+          const logoUrl = URL.createObjectURL(logoFile);
+          const logoImg = new Image();
+          logoImg.src = logoUrl;
+          logoImg.onload = () => {
+            const s = size * 0.2;
+            const x = (canvas.width - s) / 2;
+            const y = (canvas.height - s) / 2;
+            ctx.drawImage(logoImg, x, y, s, s);
+          };
+        }
+      });
+    }
+
+    function downloadQR() {
+      const canvas = document.getElementById("qrCanvas");
+      const link = document.createElement("a");
+      link.download = "qr-code.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    function shareWhatsApp() {
+      const text = document.getElementById('qrText').value;
+      const link = `https://api.whatsapp.com/send?text=Check this QR Code Generator: ${window.location.href} (Text: ${encodeURIComponent(text)})`;
+      window.open(link, '_blank');
+    }
+
+    function shareTelegram() {
+      const text = document.getElementById('qrText').value;
+      const link = `https://t.me/share/url?url=${window.location.href}&text=Check this QR Code Generator: ${encodeURIComponent(text)}`;
+      window.open(link, '_blank');
+    }
+
+    function shareInstagram() {
+      const text = document.getElementById('qrText').value;
+      const instagramUrl = `https://www.instagram.com/create/style/?caption=${encodeURIComponent(text)}`;
+      window.open(instagramUrl, '_blank');
+    }
+  </script>
+</body>
+</html>
